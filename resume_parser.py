@@ -254,7 +254,20 @@ selected = option_menu(
     orientation='horizontal'
 )
 if selected == 'Intro':
-    st.write("test")
+    st.write("""🚀 **Introducing ScanRecruit** 📄
+
+ScanRecruit is your ultimate tool for effortlessly extracting key information from PDF and DOC files, transforming your recruitment process. 📑
+
+🔍 **Key Features:**
+1. **Document Parsing:** Extracts crucial details such as name, experience, skills, location, education, phone number, email, and certifications.
+2. **Efficiency:** Quickly processes multiple files, saving you time and effort.
+3. **Accuracy:** Advanced algorithms ensure high accuracy in information extraction.
+4. **Customizable:** Tailor the extraction process to fit your specific requirements.
+5. **User-Friendly:** Intuitive interface makes it easy for anyone to use.
+6. **Export Options:** Export extracted data in various formats for seamless integration with your existing workflow.
+7. **Security:** Your data is safe and secure with our encryption measures.
+
+Say goodbye to manual data entry and hello to ScanRecruit, your trusted recruitment assistant! 🚀""")
     pass
 elif selected == 'App':
     uploaded_resumes = st.file_uploader(
