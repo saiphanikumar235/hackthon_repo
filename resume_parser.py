@@ -342,18 +342,21 @@ elif selected == 'App':
         )
         total_files = threads.get()
         if len(total_files) != 0:
+            col_1, col_2 = st.columns(2)
             df = pd.DataFrame(total_files)
             df.index = np.arange(1, len(df) + 1)
             df.index.names = ['S.No']
             res_df = st.dataframe(df)
             df['Phone No'] = '"' + df['Phone No'] + '"'
-            st.download_button(
+            col_1.download_button(
                 "Click to Download",
                 df.to_csv(),
                 "file.csv",
                 "text/csv",
                 key='download-csv'
             )
+            if col_2.button("Clear Uploads"):
+                st.experimental_rerun()
     # for index, uploaded_resume in enumerate(uploaded_resumes):
     #     if uploaded_resume.type == "application/pdf":
     #         resume_text = read_pdf(uploaded_resume)
