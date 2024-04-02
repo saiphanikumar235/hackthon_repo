@@ -356,7 +356,7 @@ elif selected == 'App':
                 key='download-csv'
             )
             if col_2.button("Clear Uploads"):
-                st.experimental_rerun()
+                st.session_state.clear()
     # for index, uploaded_resume in enumerate(uploaded_resumes):
     #     if uploaded_resume.type == "application/pdf":
     #         resume_text = read_pdf(uploaded_resume)
