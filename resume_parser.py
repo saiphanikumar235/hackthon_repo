@@ -313,10 +313,12 @@ if selected == 'Intro':
     st.write("test")
     pass
 elif selected == 'App':
+    st.session_state["file_uploader_key"] = 0
     uploaded_resumes = st.file_uploader(
         "Upload a resume (PDF or Docx)",
         type=["pdf", "docx"],
-        accept_multiple_files=True
+        accept_multiple_files=True,
+        key=st.session_state["file_uploader_key"]
     )
     total_files = []
 
@@ -331,9 +333,7 @@ elif selected == 'App':
     embeddings, llm = get_embeddings()
 
     if len(uploaded_resumes) != 0:
-        st.session_state['uploaded_files'] = []
-        for file in uploaded_resumes:
-            st.session_state['uploaded_files'].append(file)
+        st.session_state['uploaded_files'] = uploaded_resumes
         pool = ThreadPool(min(len(uploaded_resumes), 2))
         threads = pool.map_async(
             lambda file_data: get_details(
@@ -359,7 +359,7 @@ elif selected == 'App':
                 key='download-csv'
             )
             if col_2.button("Clear Uploads"):
-                st.session_state.uploaded_files.clear()
+                st.experimental_rerun()
     # for index, uploaded_resume in enumerate(uploaded_resumes):
     #     if uploaded_resume.type == "application/pdf":
     #         resume_text = read_pdf(uploaded_resume)
