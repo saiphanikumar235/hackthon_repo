@@ -331,6 +331,8 @@ elif selected == 'App':
     embeddings, llm = get_embeddings()
 
     if len(uploaded_resumes) != 0:
+        for file in uploaded_resumes:
+            st.session_state['uploaded_files'].append(file)
         pool = ThreadPool(min(len(uploaded_resumes), 2))
         threads = pool.map_async(
             lambda file_data: get_details(
