@@ -244,7 +244,7 @@ def read_docx(file):
     return my_text
 
 
-st.title("Resume Parser")
+st.title("Scan Recruit")
 selected = option_menu(
     menu_title=None,
     options=['Intro', 'App'],
