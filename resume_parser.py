@@ -2,6 +2,7 @@ import numpy as np
 import nltk
 import os
 import os
+from streamlit_option_menu import option_menu
 
 nltk.download('stopwords')
 import pandas as pd
@@ -300,57 +301,69 @@ def read_docx(file):
 
 st.title("Rapid-Recruit-X")
 # jd = st.text_input('please enter the job description below:')
-uploaded_resumes = st.file_uploader(
-    "Upload a resume (PDF or Docx)",
-    type=["pdf", "docx"],
-    accept_multiple_files=True
+selected = option_menu(
+    menu_title=None,
+    options=['Intro', 'App'],
+    icons=['menu-button-wide-fill', 'app-indicator'],
+    menu_icon='cast',
+    default_index=0,
+    orientation='horizontal'
 )
-total_files = []
-
-
-@st.experimental_singleton
-def get_embeddings():
-    llm = OpenAI(openai_api_key=st.secrets['api_key'], model_name="gpt-3.5-turbo")
-    embeddings = OpenAIEmbeddings(openai_api_key=st.secrets['api_key'])
-    return embeddings, llm
-
-
-embeddings, llm = get_embeddings()
-
-if len(uploaded_resumes) != 0:
-    pool = ThreadPool(min(len(uploaded_resumes), 2))
-    threads = pool.map_async(
-        lambda file_data: get_details(
-            read_pdf(file_data) if file_data.type == 'application/pdf' else read_docx(file_data),
-            file_data,
-            llm
-        ),
-        uploaded_resumes
+if selected == 'Intro':
+    st.write("test")
+    pass
+elif selected == 'App':
+    uploaded_resumes = st.file_uploader(
+        "Upload a resume (PDF or Docx)",
+        type=["pdf", "docx"],
+        accept_multiple_files=True
     )
-    total_files = threads.get()
-    if len(total_files) != 0:
-        df = pd.DataFrame(total_files)
-        df.index = np.arange(1, len(df) + 1)
-        df.index.names = ['S.No']
-        res_df = st.dataframe(df)
-        df['Phone No'] = '"' + df['Phone No'] + '"'
-        st.download_button(
-            "Click to Download",
-            df.to_csv(),
-            "file.csv",
-            "text/csv",
-            key='download-csv'
+    total_files = []
+
+
+    @st.experimental_singleton
+    def get_embeddings():
+        llm = OpenAI(openai_api_key=st.secrets['api_key'], model_name="gpt-3.5-turbo")
+        embeddings = OpenAIEmbeddings(openai_api_key=st.secrets['api_key'])
+        return embeddings, llm
+
+
+    embeddings, llm = get_embeddings()
+
+    if len(uploaded_resumes) != 0:
+        pool = ThreadPool(min(len(uploaded_resumes), 2))
+        threads = pool.map_async(
+            lambda file_data: get_details(
+                read_pdf(file_data) if file_data.type == 'application/pdf' else read_docx(file_data),
+                file_data,
+                llm
+            ),
+            uploaded_resumes
         )
-# for index, uploaded_resume in enumerate(uploaded_resumes):
-#     if uploaded_resume.type == "application/pdf":
-#         resume_text = read_pdf(uploaded_resume)
-#     else:
-#         resume_text = read_docx(uploaded_resume)
-#     get_knowledge_base(embeddings, resume_text)
-#     resume_details = get_details(resume_text, uploaded_resume, llm)
-#     # resume_details['Resume Score'] = compare_jd(resume_text, jd)
-#     resume_details['File Name'] = uploaded_resume.name
-#     total_files.append(
-#         resume_details
-#     )
-#     time.sleep(10)
+        total_files = threads.get()
+        if len(total_files) != 0:
+            df = pd.DataFrame(total_files)
+            df.index = np.arange(1, len(df) + 1)
+            df.index.names = ['S.No']
+            res_df = st.dataframe(df)
+            df['Phone No'] = '"' + df['Phone No'] + '"'
+            st.download_button(
+                "Click to Download",
+                df.to_csv(),
+                "file.csv",
+                "text/csv",
+                key='download-csv'
+            )
+    # for index, uploaded_resume in enumerate(uploaded_resumes):
+    #     if uploaded_resume.type == "application/pdf":
+    #         resume_text = read_pdf(uploaded_resume)
+    #     else:
+    #         resume_text = read_docx(uploaded_resume)
+    #     get_knowledge_base(embeddings, resume_text)
+    #     resume_details = get_details(resume_text, uploaded_resume, llm)
+    #     # resume_details['Resume Score'] = compare_jd(resume_text, jd)
+    #     resume_details['File Name'] = uploaded_resume.name
+    #     total_files.append(
+    #         resume_details
+    #     )
+    #     time.sleep(10)
