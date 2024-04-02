@@ -254,20 +254,20 @@ selected = option_menu(
     orientation='horizontal'
 )
 if selected == 'Intro':
-    st.write("""🚀 **Introducing ScanRecruit** 📄
+    st.title("Welcome to ScanRecruit 🚀")
+    st.markdown(
+        "ScanRecruit is your go-to solution for effortlessly extracting vital information from PDF and DOC files, revolutionizing your recruitment process. 📑")
 
-ScanRecruit is your ultimate tool for effortlessly extracting key information from PDF and DOC files, transforming your recruitment process. 📑
-
-🔍 **Key Features:**
-1. **Document Parsing:** Extracts crucial details such as name, experience, skills, location, education, phone number, email, and certifications.
-2. **Efficiency:** Quickly processes multiple files, saving you time and effort.
-3. **Accuracy:** Advanced algorithms ensure high accuracy in information extraction.
-4. **Customizable:** Tailor the extraction process to fit your specific requirements.
-5. **User-Friendly:** Intuitive interface makes it easy for anyone to use.
-6. **Export Options:** Export extracted data in various formats for seamless integration with your existing workflow.
-7. **Security:** Your data is safe and secure with our encryption measures.
-
-Say goodbye to manual data entry and hello to ScanRecruit, your trusted recruitment assistant! 🚀""")
+    st.subheader("Key Features:")
+    st.markdown("""
+        1. **Document Parsing:** Extracts essential details like name, experience, skills, location, education, phone number, email, and certifications.
+        2. **Efficiency:** Rapidly processes multiple files, saving valuable time and effort.
+        3. **Accuracy:** Utilizes advanced algorithms for precise information extraction.
+        4. **Customization:** Tailors the extraction process to match your specific needs.
+        5. **User-Friendly Interface:** Intuitive design ensures ease of use for all users.
+        6. **Export Options:** Offers multiple formats for exporting extracted data, seamlessly integrating with your workflow.
+        """)
+    st.write("Experience the convenience of automated data extraction with ScanRecruit on your Streamlit platform! 🚀")
     pass
 elif selected == 'App':
     uploaded_resumes = st.file_uploader(
