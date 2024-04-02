@@ -32,9 +32,6 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate, HumanMessagePr
 from langchain.chat_models import ChatOpenAI
 import time
 
-# os.system("python -m spacy download en_core_web_sm")
-# os.system("python -m nltk.downloader words")
-# os.system("python -m nltk.downloader stopwords")
 nltk.download('punkt')
 
 linked_data = open('./linkedin skill', 'r', encoding="utf8").readlines()
@@ -43,7 +40,6 @@ cities_data = open("./cities.txt", 'r').readlines()
 
 def get_knowledge_base(embeddings, text):
     api_key = st.secrets['api_key']
-    # Split the text into chunks using Langchain's CharacterTextSplitter
     text_splitter = CharacterTextSplitter(
         separator="\n",
         chunk_size=1000,
@@ -51,9 +47,6 @@ def get_knowledge_base(embeddings, text):
         length_function=len
     )
     chunks = text_splitter.split_text(text)
-
-    # Convert the chunks of text into embeddings to form a knowledge base
-    # embeddings = OpenAIEmbeddings(openai_api_key=api_key)
     knowledgeBase = FAISS.from_texts(chunks, embeddings)
     return knowledgeBase
 
@@ -82,14 +75,6 @@ def compare_jd(resume_text, jd):
         resume_vector = np.mean([model.wv[token] for token in resume_tokens], axis=0)
         job_desc_vector = np.mean([model.wv[token] for token in job_desc_tokens], axis=0)
         MatchPercentage = cosine_similarity(resume_vector, job_desc_vector) * 100
-        # Req_Clear = ''.join(open("./req.txt", 'r', encoding="utf8").readlines()).replace("\n", "")
-        # jd_text = jd
-        # Match_Test = [resume_text.lower(), jd_text.lower()]
-        # cv = TfidfVectorizer()
-        # count_matrix = cv.fit_transform(Match_Test)
-        # MatchPercentage = cosine_similarity(count_matrix[0], count_matrix[1])
-        # MatchPercentage = round(MatchPercentage[0][0]*100, 2)
-        # print('Match Percentage is :' + str(MatchPercentage) + '% to Requirement')
         return MatchPercentage
     return "No JD to Compare"
 
@@ -119,10 +104,6 @@ def get_phone_numbers(string):
     if len(extracted_phone_numbers) != 0:
         return ','.join(extracted_phone_numbers)
 
-    # r = re.compile(r'(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})')
-    # phone_numbers = r.findall(string)
-    # return ','.join(list(set([re.sub(r'\D', '', num) for num in phone_numbers])))
-
 
 def get_education(path, resume_text, llm, knowledgeBase):
     education_new = ResumeParser(path).get_extracted_data()
@@ -135,10 +116,8 @@ def get_education(path, resume_text, llm, knowledgeBase):
                                       'what is the highest education degree give me in json format where key is degree',
                                       llm,
                                       knowledgeBase)
-        # st.write(res)
         if res.startswith('{'):
             res = json.loads(res)
-            # time.sleep(60)
             return res['degree']
         return None
 
@@ -207,40 +186,6 @@ def extract_certifications(resume_text, llm, knowledgeBase):
 
 
 def get_exp(resume_text, llm, knowledgeBase):
-    # words_to_numbers = {
-    #     'one': '1',
-    #     'two': '2',
-    #     'three': '3',
-    #     'four': '4',
-    #     'five': '5',
-    #     'six': '6',
-    #     'seven': '7',
-    #     'eight': '8',
-    #     'nine': '9',
-    #     'zero': '0'
-    # }
-    # pattern = re.compile(r'\b(' + '|'.join(words_to_numbers.keys()) + r')\b')
-    # nlp = spacy.load('en_core_web_sm')
-    # doc = nlp(resume_text)
-    # for ent in doc.ents:
-    #     if ent.label_ == "DATE" and ent.text.lower() in ["year"]:
-    #         years_of_experience = ent.text
-    #         for y in years_of_experience.split():
-    #             if '.' in y:
-    #                 return y
-    #             if y.lower() in words_to_numbers.keys() or y.replace('+', '').isnumeric():
-    #                 years = f"{y.replace('+', '')}+"
-    #                 return re.sub(pattern, lambda x: words_to_numbers[x.group()], years)
-    # for ent in doc.ents:
-    #     if ent.label_ == 'CARDINAL':
-    #         years_of_experience = ent.text
-    #         for y in years_of_experience.split():
-    #             if '.' in y and '+' in y:
-    #                 return y.replace('++', '+')
-    #             if y.lower() in words_to_numbers.keys() or y.isnumeric():
-    #                 print(y)
-    #                 years = f'{y}+'
-    #                 return re.sub(pattern, lambda x: words_to_numbers[x.group()], years)
     time.sleep(1)
     exp = get_details_from_openai(resume_text,
                                   'what is the number of years of experience give me in json format where key is exp',
@@ -299,8 +244,7 @@ def read_docx(file):
     return my_text
 
 
-st.title("Rapid-Recruit-X")
-# jd = st.text_input('please enter the job description below:')
+st.title("Resume Parser")
 selected = option_menu(
     menu_title=None,
     options=['Intro', 'App'],
@@ -313,12 +257,10 @@ if selected == 'Intro':
     st.write("test")
     pass
 elif selected == 'App':
-    st.session_state["file_uploader_key"] = 0
     uploaded_resumes = st.file_uploader(
         "Upload a resume (PDF or Docx)",
         type=["pdf", "docx"],
         accept_multiple_files=True,
-        key=st.session_state["file_uploader_key"]
     )
     total_files = []
 
@@ -333,7 +275,6 @@ elif selected == 'App':
     embeddings, llm = get_embeddings()
 
     if len(uploaded_resumes) != 0:
-        st.session_state['uploaded_files'] = uploaded_resumes
         pool = ThreadPool(min(len(uploaded_resumes), 2))
         threads = pool.map_async(
             lambda file_data: get_details(
@@ -358,19 +299,3 @@ elif selected == 'App':
                 "text/csv",
                 key='download-csv'
             )
-            if col_2.button("Clear Uploads"):
-                st.session_state['file_uploader_key'] += 1
-                st.experimental_rerun()
-    # for index, uploaded_resume in enumerate(uploaded_resumes):
-    #     if uploaded_resume.type == "application/pdf":
-    #         resume_text = read_pdf(uploaded_resume)
-    #     else:
-    #         resume_text = read_docx(uploaded_resume)
-    #     get_knowledge_base(embeddings, resume_text)
-    #     resume_details = get_details(resume_text, uploaded_resume, llm)
-    #     # resume_details['Resume Score'] = compare_jd(resume_text, jd)
-    #     resume_details['File Name'] = uploaded_resume.name
-    #     total_files.append(
-    #         resume_details
-    #     )
-    #     time.sleep(10)
