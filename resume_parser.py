@@ -1,14 +1,13 @@
-import numpy as np
 import nltk
 import os
 import os
-from streamlit_option_menu import option_menu
 
 nltk.download('stopwords')
+from streamlit_option_menu import option_menu
+from collections import Counter
+import re
 import pandas as pd
 import PyPDF2, pdfplumber, nlp, re, docx2txt, streamlit as st, nltk
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 import spacy
 from spacy.matcher import Matcher
 from spacy.tokens import Span
@@ -16,7 +15,6 @@ from nltk.corpus import stopwords
 from pathlib import Path
 import json
 from pyresparser import ResumeParser
-from gensim.models import Word2Vec
 from nltk.tokenize import word_tokenize
 import nltk
 import numpy as np
@@ -31,7 +29,6 @@ from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from langchain.prompts import PromptTemplate, ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain.chat_models import ChatOpenAI
 import time
-
 nltk.download('punkt')
 
 linked_data = open('./linkedin skill', 'r', encoding="utf8").readlines()
